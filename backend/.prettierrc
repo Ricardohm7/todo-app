@@ -2,7 +2,7 @@
   "arrowParens": "always",
   "bracketSameLine": false,
   "bracketSpacing": false,
-  "semi": false,
+  "semi": true,
   "experimentalTernaries": false,
   "singleQuote": true,
   "quoteProps": "as-needed",
