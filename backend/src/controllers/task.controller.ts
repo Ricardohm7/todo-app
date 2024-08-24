@@ -19,8 +19,8 @@ export const getTasks = async (req: Request, res: Response) => {
   try {
     const status = req.body.status as string;
     const filter = status ? {status} : {};
-    // const tasks = await Task.find(filter).populate('subtasks');
-    const tasks = await Task.find(filter);
+    const tasks = await Task.find(filter).populate('subtasks');
+    // const tasks = await Task.find(filter);
     res.json(tasks);
   } catch (error) {
     handleError(res, error);
@@ -78,11 +78,9 @@ export const updateTaskStatus = async (req: Request, res: Response) => {
       (subtask) => subtask.status === TaskStatus.Completed,
     );
     if (req.body.status === TaskStatus.Completed && !allSubtasksCompleted) {
-      return res
-        .status(400)
-        .json({
-          message: 'Cannot mark task as completed when subtasks are pending',
-        });
+      return res.status(400).json({
+        message: 'Cannot mark task as completed when subtasks are pending',
+      });
     }
     task.status = req.body.status;
     await task.save();

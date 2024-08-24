@@ -4,6 +4,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import connectDB from './config/database';
 import taskRoutes from './routes/task.routes';
+import subtaskRoutes from './routes/subtask.routes';
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use(express.json());
     await connectDB();
 
     app.use('/api/tasks', taskRoutes);
+    app.use('/api/subtasks', subtaskRoutes);
 
     app.get('/', (req, res) => {
       res.send('Todo List API');
