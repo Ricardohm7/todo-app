@@ -1,18 +1,23 @@
 import mongoose, {Schema, Document} from 'mongoose';
 import {ISubtask} from './subtask.model';
+import {TaskStatus} from './status.enum';
 
 export interface ITask extends Document {
   title: string;
   description: string;
-  status: 'pending' | 'completed';
+  status: TaskStatus;
   subtasks: ISubtask['_id'][];
 }
 
 const TaskSchema: Schema = new Schema({
   title: {type: String, required: true},
   description: {type: String, required: true},
-  status: {type: String, enum: ['pending', 'completed'], default: 'pending'},
+  status: {
+    type: String,
+    enum: Object.values(TaskStatus),
+    default: TaskStatus.Pending,
+  },
   subtasks: [{type: Schema.Types.ObjectId, ref: 'Subtask'}],
 });
 
-export default mongoose.model<ITask>('Task', TaskSchema);
+export const Task = mongoose.model<ITask>('Task', TaskSchema);

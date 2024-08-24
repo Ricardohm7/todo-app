@@ -1,6 +1,9 @@
+// import './models/task.model';
+// import './models/subtask.model';
 import express from 'express';
 import dotenv from 'dotenv';
 import connectDB from './config/database';
+import taskRoutes from './routes/task.routes';
 
 dotenv.config();
 
@@ -11,6 +14,8 @@ app.use(express.json());
 (async () => {
   try {
     await connectDB();
+
+    app.use('/api/tasks', taskRoutes);
 
     app.get('/', (req, res) => {
       res.send('Todo List API');
