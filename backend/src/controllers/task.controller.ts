@@ -19,7 +19,9 @@ export const getTasks = async (req: Request, res: Response) => {
   try {
     const status = req.body.status as string;
     const filter = status ? {status} : {};
-    const tasks = await Task.find(filter).populate('subtasks');
+    const tasks = await Task.find(filter)
+      .populate('subtasks')
+      .populate('comments');
     // const tasks = await Task.find(filter);
     res.json(tasks);
   } catch (error) {
@@ -29,7 +31,9 @@ export const getTasks = async (req: Request, res: Response) => {
 
 export const getTask = async (req: Request, res: Response) => {
   try {
-    const task = await Task.findById(req.params.id);
+    const task = await Task.findById(req.params.id)
+      .populate('subtasks')
+      .populate('comments');
     if (!task) {
       return res.status(404).json({message: 'Task not found'});
     }
