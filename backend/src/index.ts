@@ -2,16 +2,19 @@
 // import './models/subtask.model';
 import express from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import connectDB from './config/database';
 import taskRoutes from './routes/task.routes';
 import subtaskRoutes from './routes/subtask.routes';
 import commentRoutes from './routes/comment.routes';
 import authRoutes from './routes/auth.routes';
+import {corsOptions} from './config/cors.config';
+import {config} from './config';
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+app.use(cors(corsOptions));
 app.use(express.json());
 
 (async () => {
@@ -27,8 +30,8 @@ app.use(express.json());
       res.send('Todo List API');
     });
 
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+    app.listen(config.serverPort, () => {
+      console.log(`Server is running on port ${config.serverPort}`);
     });
   } catch (error) {
     console.log(
