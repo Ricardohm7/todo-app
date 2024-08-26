@@ -55,6 +55,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
       });
       if (response.ok) {
         const {accessToken, user} = await response.json();
+        sessionStorage.setItem('accessToken', accessToken);
+        sessionStorage.setItem('user', JSON.stringify(user));
         setAccessToken(accessToken);
         setUserState(user);
       } else {
@@ -67,8 +69,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   };
 
   useEffect(() => {
-    refreshToken();
+    if (typeof window !== 'undefined') {
+      // Retrieve value from sessionStorage
+      const accessToken = sessionStorage.getItem('accessToken');
+      const user = sessionStorage.getItem('user');
+      if (accessToken && user) {
+        setAccessToken(accessToken);
+        setUserState(JSON.parse(user));
+      } else {
+        refreshToken();
+      }
+    }
   }, []);
+  console.log('accessToken', accessToken);
 
   return (
     <AuthContext.Provider
