@@ -1,13 +1,15 @@
 import {Request, Response} from 'express';
 import {Subtask} from '../models/subtask.model';
-import {Task} from '../models/task.model';
+import {ITask, Task} from '../models/task.model';
 
 import {handleError} from '../utils/errorHandler';
 import {TaskStatus} from '../models/status.enum';
+import {FilterQuery} from 'mongoose';
 
 export const createTask = async (req: Request, res: Response) => {
   try {
-    const task = new Task(req.body);
+    const {title, description, userId} = req.body;
+    const task = new Task({title, description, createdBy: userId});
     await task.save();
     res.status(201).json(task);
   } catch (error) {
@@ -17,11 +19,19 @@ export const createTask = async (req: Request, res: Response) => {
 
 export const getTasks = async (req: Request, res: Response) => {
   try {
-    const status = req.body.status as string;
-    const filter = status ? {status} : {};
+    console.log('params', req.params);
+    const userId = req.params.userId;
+    const status = req.query.status as string;
+
+    const filter: FilterQuery<ITask> = {createdBy: userId};
+    if (status) {
+      filter.status = status;
+    }
+
     const tasks = await Task.find(filter)
       .populate('subtasks')
-      .populate('comments');
+      .populate('comments')
+      .populate('createdBy', 'username email'); // Only populate necessary fields from User
     // const tasks = await Task.find(filter);
     res.json(tasks);
   } catch (error) {
@@ -33,7 +43,9 @@ export const getTask = async (req: Request, res: Response) => {
   try {
     const task = await Task.findById(req.params.id)
       .populate('subtasks')
-      .populate('comments');
+      .populate('comments')
+      .populate('createdBy', 'username email');
+
     if (!task) {
       return res.status(404).json({message: 'Task not found'});
     }

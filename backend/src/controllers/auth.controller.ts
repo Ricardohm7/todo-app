@@ -9,7 +9,7 @@ export const register = async (req: Request, res: Response) => {
     const {username, email, password} = req.body;
     const user = new User({username, email, password});
     await user.save();
-    res.status(201).json({message: 'User registered successfully'});
+    res.status(201).json({userId: user._id});
   } catch (error) {
     handleError(res, error, 400);
   }
@@ -47,14 +47,19 @@ export const login = async (req: Request, res: Response) => {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
-    res.json({accessToken});
+    res.json({
+      accessToken,
+      user: {
+        id: user._id,
+        username: user.username,
+      },
+    });
   } catch (error) {
     handleError(res, error, 400);
   }
 };
 
 export const refresh = async (req: Request, res: Response) => {
-  console.log('cookies', req.cookies);
   const refreshToken = req.cookies.refreshToken;
   if (!refreshToken) {
     return res.status(401).json({message: 'Refresh token not found'});
@@ -72,7 +77,12 @@ export const refresh = async (req: Request, res: Response) => {
       expiresIn: '15m',
     });
 
-    res.json({accessToken});
+    res.json({
+      accessToken,
+      user: {
+        id: userId,
+      },
+    });
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error: unknown) {
     res.status(401).json({message: 'Invalid refresh token'});
