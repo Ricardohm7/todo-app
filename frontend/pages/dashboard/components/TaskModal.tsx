@@ -1,8 +1,8 @@
 import {useState} from 'react';
 import {useAuth} from '@/contexts/AuthContext';
-import {useTasks} from '@/hooks/useTasks';
 import {TaskInput} from '@/models/Task';
 import {TaskStatus} from '@/models/taskStatus.enums';
+import {useTasks} from '@/contexts/TaskContext';
 
 interface TaskModalProps {
   isOpen: boolean;

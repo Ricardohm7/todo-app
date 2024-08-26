@@ -1,9 +1,9 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import TaskItem from './components/TaskItem';
-import {useTasks} from '@/hooks/useTasks';
 import {Task} from '@/models/Task';
 import TaskModal from './components/TaskModal';
 import {TaskStatus} from '@/models/taskStatus.enums';
+import {useTasks} from '@/contexts/TaskContext';
 
 const DashboardPage = () => {
   const [isOpenAddTaskModal, setIsOpenAddTaskModal] = useState(false);

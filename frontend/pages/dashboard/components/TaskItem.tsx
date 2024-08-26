@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import SubtaskList from './SubtaskList';
 import {FaTrash} from 'react-icons/fa';
-import {useTasks} from '@/hooks/useTasks';
+import {useTasks} from '@/contexts/TaskContext';
 
 const TaskItem = ({task, onTaskUpdated}) => {
   const [isExpanded, setIsExpanded] = useState(false);
