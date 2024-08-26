@@ -1,8 +1,8 @@
-// import './models/task.model';
-// import './models/subtask.model';
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
+dotenv.config();
+
 import connectDB from './config/database';
 import taskRoutes from './routes/task.routes';
 import subtaskRoutes from './routes/subtask.routes';
@@ -10,12 +10,17 @@ import commentRoutes from './routes/comment.routes';
 import authRoutes from './routes/auth.routes';
 import {corsOptions} from './config/cors.config';
 import {config} from './config';
-
-dotenv.config();
+import cookieParser from 'cookie-parser';
 
 const app = express();
+// Cross Origin Resource Sharing
 app.use(cors(corsOptions));
+
+// built-in middleware for json
 app.use(express.json());
+
+//middleware for cookies
+app.use(cookieParser());
 
 (async () => {
   try {
