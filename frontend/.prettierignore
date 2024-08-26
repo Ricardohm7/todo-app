@@ -1,0 +1,17 @@
+# Ignore artifacts:
+build
+coverage
+
+.prettierrc
+nodemon.json
+package.json
+package-lock.json
+tsconfig.json
+eslintrc.json
+.eslintrc.json
+
+postcss.config.mjs
+README.md
+styles/globals.css
+tailwind.config.ts
+next.config.mjs
