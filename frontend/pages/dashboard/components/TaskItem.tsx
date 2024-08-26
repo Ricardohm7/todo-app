@@ -1,9 +1,10 @@
 import React, {useState} from 'react';
 import SubtaskList from './SubtaskList';
-import {FaChevronDown, FaTrash} from 'react-icons/fa';
+import {FaChevronDown, FaEdit, FaTrash} from 'react-icons/fa';
 import {useTasks} from '@/contexts/TaskContext';
 import {Task} from '@/models/Task';
 import {TaskStatus} from '@/models/taskStatus.enums';
+import TaskModal from './TaskModal';
 
 interface TaskItemProps {
   task: Task;
@@ -15,10 +16,8 @@ const TaskItem: React.FC<TaskItemProps> = ({task, statusList}) => {
   const {deleteTask, updateTaskStatus} = useTasks();
   const [isOpen, setIsOpen] = useState(false);
   const [status, setStatus] = useState(task.status); // Initialize with default status
-
-  // const toggleStatus = async (status: TaskStatus) => {
-  //   await updateTaskStatus(task._id, status);
-  // };
+  const [isOpenAddTaskModal, setIsOpenAddTaskModal] = useState(false);
+  const [editTask, setEditTask] = useState(false);
 
   const onDeleteTask = async () => {
     await deleteTask(task._id);
@@ -32,6 +31,11 @@ const TaskItem: React.FC<TaskItemProps> = ({task, statusList}) => {
     await updateTaskStatus(task._id, newStatus);
     setStatus(newStatus);
     setIsOpen(false); // Close dropdown after selection
+  };
+
+  const onEditTask = () => {
+    setEditTask(true);
+    setIsOpenAddTaskModal(true);
   };
 
   return (
@@ -81,9 +85,19 @@ const TaskItem: React.FC<TaskItemProps> = ({task, statusList}) => {
           onSubtaskUpdated={() => {}}
         />
       )}
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-3">
         <FaTrash onClick={onDeleteTask} className="cursor-pointer" />
+        <FaEdit onClick={onEditTask} className="cursor-pointer" />
       </div>
+      {isOpenAddTaskModal && (
+        <TaskModal
+          isOpen={isOpenAddTaskModal}
+          onClose={() => setIsOpenAddTaskModal(false)}
+          section={task.status}
+          editMode={editTask}
+          taskData={task}
+        />
+      )}
     </div>
   );
 };

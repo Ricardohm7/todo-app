@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {useAuth} from '@/contexts/AuthContext';
-import {TaskInput} from '@/models/Task';
+import {Task, TaskInput} from '@/models/Task';
 import {TaskStatus} from '@/models/taskStatus.enums';
 import {useTasks} from '@/contexts/TaskContext';
 
@@ -8,14 +8,22 @@ interface TaskModalProps {
   isOpen: boolean;
   onClose: () => void;
   section: TaskStatus | null;
+  editMode?: boolean;
+  taskData?: Task;
 }
 
-const TaskModal: React.FC<TaskModalProps> = ({isOpen, onClose, section}) => {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+const TaskModal: React.FC<TaskModalProps> = ({
+  isOpen,
+  onClose,
+  section,
+  editMode = false,
+  taskData,
+}) => {
+  const [title, setTitle] = useState(taskData?.title ?? '');
+  const [description, setDescription] = useState(taskData?.description ?? '');
   const [activity, setActivity] = useState([]);
   const [comment, setComment] = useState('');
-  const {createTask} = useTasks();
+  const {createTask, updateTask} = useTasks();
   const {user} = useAuth();
 
   if (!isOpen) return null;
@@ -27,7 +35,11 @@ const TaskModal: React.FC<TaskModalProps> = ({isOpen, onClose, section}) => {
       status: section ?? TaskStatus.Pending,
       userId: user?.id ?? '',
     };
-    await createTask(newTask);
+    if (!editMode) {
+      await createTask(newTask);
+    } else {
+      await updateTask(taskData?._id ?? '', newTask);
+    }
     setTitle('');
     setDescription('');
     setActivity([]);
