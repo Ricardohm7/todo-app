@@ -10,6 +10,14 @@ interface TaskModalProps {
   section: TaskStatus | null;
   editMode?: boolean;
   taskData?: Task;
+  onSave: ({
+    title,
+    description,
+  }: {
+    title: string;
+    description: string;
+  }) => Promise<void>;
+  modalTitle: string;
 }
 
 const TaskModal: React.FC<TaskModalProps> = ({
@@ -18,6 +26,8 @@ const TaskModal: React.FC<TaskModalProps> = ({
   section,
   editMode = false,
   taskData,
+  onSave,
+  modalTitle,
 }) => {
   const [title, setTitle] = useState(taskData?.title ?? '');
   const [description, setDescription] = useState(taskData?.description ?? '');
@@ -29,17 +39,7 @@ const TaskModal: React.FC<TaskModalProps> = ({
   if (!isOpen) return null;
 
   const handleSave = async () => {
-    const newTask: TaskInput = {
-      title,
-      description,
-      status: section ?? TaskStatus.Pending,
-      userId: user?.id ?? '',
-    };
-    if (!editMode) {
-      await createTask(newTask);
-    } else {
-      await updateTask(taskData?._id ?? '', newTask);
-    }
+    await onSave({title, description});
     setTitle('');
     setDescription('');
     setActivity([]);
@@ -58,7 +58,9 @@ const TaskModal: React.FC<TaskModalProps> = ({
       <div className="bg-gray-900 text-white rounded-lg shadow-lg p-6 w-96">
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-bold">Add a task in {section}</h2>
+          <h2 className="text-lg font-bold">
+            {modalTitle} in {section}
+          </h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-200"

@@ -2,9 +2,11 @@ import React, {useState} from 'react';
 import SubtaskList from './SubtaskList';
 import {FaChevronDown, FaEdit, FaTrash} from 'react-icons/fa';
 import {useTasks} from '@/contexts/TaskContext';
-import {Task} from '@/models/Task';
+import {Task, TaskInput} from '@/models/Task';
 import {TaskStatus} from '@/models/taskStatus.enums';
 import TaskModal from './TaskModal';
+import {useAuth} from '@/contexts/AuthContext';
+import {SubtaskInput} from '@/models/Subtask';
 
 interface TaskItemProps {
   task: Task;
@@ -13,11 +15,15 @@ interface TaskItemProps {
 
 const TaskItem: React.FC<TaskItemProps> = ({task, statusList}) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const {deleteTask, updateTaskStatus} = useTasks();
+  const {deleteTask, updateTaskStatus, createTask, updateTask, createSubtask} =
+    useTasks();
   const [isOpen, setIsOpen] = useState(false);
   const [status, setStatus] = useState(task.status); // Initialize with default status
   const [isOpenAddTaskModal, setIsOpenAddTaskModal] = useState(false);
+  const [isOpenAddSubtaskModal, setIsOpenAddSubtaskModal] = useState(false);
   const [editTask, setEditTask] = useState(false);
+  const [isEditingSubtask, setIsEditingSubtask] = useState(false);
+  const {user} = useAuth();
 
   const onDeleteTask = async () => {
     await deleteTask(task._id);
@@ -36,6 +42,46 @@ const TaskItem: React.FC<TaskItemProps> = ({task, statusList}) => {
   const onEditTask = () => {
     setEditTask(true);
     setIsOpenAddTaskModal(true);
+  };
+
+  const onAddSubtask = () => {
+    setIsOpenAddSubtaskModal(true);
+  };
+
+  const handleSave = async ({
+    title,
+    description,
+  }: {
+    title: string;
+    description: string;
+  }) => {
+    const newTask: TaskInput = {
+      title,
+      description,
+      status: task.status,
+      userId: user?.id ?? '',
+    };
+    if (!editTask) {
+      await createTask(newTask);
+    } else {
+      await updateTask(task?._id ?? '', newTask);
+    }
+  };
+
+  const handleSaveSubtask = async ({
+    title,
+    description,
+  }: {
+    title: string;
+    description: string;
+  }) => {
+    const newSubtask: SubtaskInput = {
+      title,
+      description,
+      status: task.status,
+      task: task._id,
+    };
+    await createSubtask(newSubtask);
   };
 
   return (
@@ -83,6 +129,7 @@ const TaskItem: React.FC<TaskItemProps> = ({task, statusList}) => {
           taskId={task._id}
           subtasks={task.subtasks}
           onSubtaskUpdated={() => {}}
+          onAddSubtTask={onAddSubtask}
         />
       )}
       <div className="flex justify-end gap-3">
@@ -96,6 +143,18 @@ const TaskItem: React.FC<TaskItemProps> = ({task, statusList}) => {
           section={task.status}
           editMode={editTask}
           taskData={task}
+          onSave={handleSave}
+          modalTitle="Add Task"
+        />
+      )}
+      {isOpenAddSubtaskModal && (
+        <TaskModal
+          isOpen={isOpenAddSubtaskModal}
+          onClose={() => setIsOpenAddSubtaskModal(false)}
+          section={task.status}
+          editMode={editTask}
+          onSave={handleSaveSubtask}
+          modalTitle="Add Subtask"
         />
       )}
     </div>

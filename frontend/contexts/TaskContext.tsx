@@ -3,6 +3,7 @@ import {mapTaskFromApi, Task} from '../models/Task';
 import {useApi} from '@/services/api';
 import {useAuth} from './AuthContext';
 import {TaskStatus} from '@/models/taskStatus.enums';
+import {Subtask} from '@/models/Subtask';
 
 interface TasksContextType {
   tasks: Task[];
@@ -14,6 +15,7 @@ interface TasksContextType {
   deleteTask: (id: string) => Promise<void>;
   updateTask: (id: string, taskData: Partial<Task>) => Promise<void>;
   updateTaskStatus: (taskId: string, status: TaskStatus) => Promise<void>;
+  createSubtask: (subtaskData: Partial<Subtask>) => Promise<void>;
   // Add other functions as needed
 }
 
@@ -99,6 +101,25 @@ export const TasksProvider: React.FC<{children: ReactNode}> = ({children}) => {
     }
   };
 
+  const createSubtask = async (subtaskData: Partial<Subtask>) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await api.post(`/subtasks`, subtaskData);
+      const updateTasks = tasks.map((task) =>
+        task._id === subtaskData.task
+          ? {...task, subtasks: [...task.subtasks, subtaskData]}
+          : task,
+      );
+      debugger;
+      setTasks(updateTasks);
+    } catch (err) {
+      setError('Failed to delete task');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <TasksContext.Provider
       value={{
@@ -111,6 +132,7 @@ export const TasksProvider: React.FC<{children: ReactNode}> = ({children}) => {
         deleteTask,
         updateTask,
         updateTaskStatus,
+        createSubtask,
       }}
     >
       {children}
