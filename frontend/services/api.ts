@@ -23,8 +23,6 @@ export const useApi = () => {
         // Token has expired
         try {
           await refreshToken();
-          // Retry the request with the new token
-          return fetchWithToken(endpoint, options);
         } catch (error) {
           // If refresh fails, log out the user
           logout();

@@ -52,7 +52,11 @@ const DashboardPage = () => {
             <div key={key} className="task-column bg-gray-900 p-4 rounded-lg">
               <h2 className="text-white font-bold mb-2">{key}</h2>
               {groupedTasks[key].map((task) => (
-                <TaskItem key={task._id} task={task} onTaskUpdated={() => {}} />
+                <TaskItem
+                  key={task._id}
+                  task={task}
+                  statusList={Object.keys(groupedTasks)}
+                />
               ))}
               <button
                 onClick={() => handleAddNewTaskModal(key)}

@@ -2,6 +2,7 @@ import React, {createContext, useContext, ReactNode, useState} from 'react';
 import {mapTaskFromApi, Task} from '../models/Task';
 import {useApi} from '@/services/api';
 import {useAuth} from './AuthContext';
+import {TaskStatus} from '@/models/taskStatus.enums';
 
 interface TasksContextType {
   tasks: Task[];
@@ -12,13 +13,13 @@ interface TasksContextType {
   createTask: (taskData: Partial<Task>) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
   updateTask: (id: string, taskData: Partial<Task>) => Promise<void>;
+  updateTaskStatus: (taskId: string, status: TaskStatus) => Promise<void>;
   // Add other functions as needed
 }
 
 const TasksContext = createContext<TasksContextType | undefined>(undefined);
 
 export const TasksProvider: React.FC<{children: ReactNode}> = ({children}) => {
-  // const tasksData = useTasksHook(); // Use your original hook
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -81,6 +82,23 @@ export const TasksProvider: React.FC<{children: ReactNode}> = ({children}) => {
     }
   };
 
+  const updateTaskStatus = async (taskId: string, status: TaskStatus) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await api.patch(`/tasks/${taskId}/status`, {status});
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task._id === taskId ? {...task, status} : task,
+        ),
+      );
+    } catch (err) {
+      setError('Failed to delete task');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <TasksContext.Provider
       value={{
@@ -92,6 +110,7 @@ export const TasksProvider: React.FC<{children: ReactNode}> = ({children}) => {
         createTask,
         deleteTask,
         updateTask,
+        updateTaskStatus,
       }}
     >
       {children}
