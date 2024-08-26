@@ -8,8 +8,8 @@ import {FilterQuery} from 'mongoose';
 
 export const createTask = async (req: Request, res: Response) => {
   try {
-    const {title, description, userId} = req.body;
-    const task = new Task({title, description, createdBy: userId});
+    const {title, description, userId, status} = req.body;
+    const task = new Task({title, description, status, createdBy: userId});
     await task.save();
     res.status(201).json(task);
   } catch (error) {
@@ -19,7 +19,6 @@ export const createTask = async (req: Request, res: Response) => {
 
 export const getTasks = async (req: Request, res: Response) => {
   try {
-    console.log('params', req.params);
     const userId = req.params.userId;
     const status = req.query.status as string;
 

@@ -8,6 +8,7 @@ import taskRoutes from './routes/task.routes';
 import subtaskRoutes from './routes/subtask.routes';
 import commentRoutes from './routes/comment.routes';
 import authRoutes from './routes/auth.routes';
+import userRoutes from './routes/user.routes';
 import {corsOptions} from './config/cors.config';
 import {config} from './config';
 import cookieParser from 'cookie-parser';
@@ -30,6 +31,7 @@ app.use(cookieParser());
     app.use('/api/subtasks', subtaskRoutes);
     app.use('/api/comments', commentRoutes);
     app.use('/api/auth', authRoutes);
+    app.use('/api/users', userRoutes);
 
     app.get('/', (req, res) => {
       res.send('Todo List API');
