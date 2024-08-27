@@ -130,12 +130,6 @@ const TaskModal: React.FC<TaskModalProps> = ({
 
         {/* Action Buttons */}
         <div className="flex justify-end mt-4">
-          {/* <button
-            onClick={onClose}
-            className="bg-gray-700 text-sm px-4 py-2 rounded-lg mr-2 hover:bg-gray-600"
-          >
-            Cancel
-          </button> */}
           <button
             onClick={handleSave}
             className="bg-blue-600 text-sm px-4 py-2 rounded-lg hover:bg-blue-500"

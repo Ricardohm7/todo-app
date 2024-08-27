@@ -43,6 +43,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   const logout = async () => {
     setAccessToken(null);
     setUserState(null);
+    sessionStorage.clear();
     // Call backend to invalidate refresh token
     await fetch('/api/auth/logout', {method: 'POST', credentials: 'include'});
   };
@@ -81,7 +82,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
       }
     }
   }, []);
-  console.log('accessToken', accessToken);
 
   return (
     <AuthContext.Provider

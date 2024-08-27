@@ -15,7 +15,7 @@ const SubtaskList: React.FC<SubtaskListProps> = ({
   onAddSubtTask,
 }) => {
   return (
-    <div className="mt-4 pl-4 border-l mb-4">
+    <div className="mt-4 pl-4 border-l mb-4 bg-gray-600 p-4 rounded-md">
       <div className="flex items-center">
         <h4 className="flex-1 text-lg font-semibold mb-2">Subtasks</h4>{' '}
         <FaPlus className="cursor-pointer" onClick={onAddSubtTask} />
