@@ -32,10 +32,20 @@ const TaskItem: React.FC<TaskItemProps> = ({task, statusList}) => {
     setIsOpen(!isOpen);
   };
 
+  const checkIfSubtaskAreCompleteed = (task: Task) => {
+    const result = task.subtasks.filter(
+      (sub) => sub.status === TaskStatus.Completed,
+    );
+    return result.length === task.subtasks.length ? true : false;
+  };
+
   const changeStatus = async (newStatus: TaskStatus) => {
-    await updateTaskStatus(task._id, newStatus);
-    setStatus(newStatus);
-    setIsOpen(false); // Close dropdown after selection
+    //check if has subtask and there are no pending
+    if (checkIfSubtaskAreCompleteed(task)) {
+      await updateTaskStatus(task._id, newStatus);
+      setStatus(newStatus);
+      setIsOpen(false); // Close dropdown after selection
+    }
   };
 
   const onEditTask = () => {
