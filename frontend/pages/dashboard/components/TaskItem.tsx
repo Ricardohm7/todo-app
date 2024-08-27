@@ -22,7 +22,6 @@ const TaskItem: React.FC<TaskItemProps> = ({task, statusList}) => {
   const [isOpenAddTaskModal, setIsOpenAddTaskModal] = useState(false);
   const [isOpenAddSubtaskModal, setIsOpenAddSubtaskModal] = useState(false);
   const [editTask, setEditTask] = useState(false);
-  const [isEditingSubtask, setIsEditingSubtask] = useState(false);
   const {user} = useAuth();
 
   const onDeleteTask = async () => {
@@ -48,7 +47,7 @@ const TaskItem: React.FC<TaskItemProps> = ({task, statusList}) => {
     setIsOpenAddSubtaskModal(true);
   };
 
-  const handleSave = async ({
+  const handleUpdateTask = async ({
     title,
     description,
   }: {
@@ -61,11 +60,7 @@ const TaskItem: React.FC<TaskItemProps> = ({task, statusList}) => {
       status: task.status,
       userId: user?.id ?? '',
     };
-    if (!editTask) {
-      await createTask(newTask);
-    } else {
-      await updateTask(task?._id ?? '', newTask);
-    }
+    await updateTask(task?._id ?? '', newTask);
   };
 
   const handleSaveSubtask = async ({
@@ -131,7 +126,7 @@ const TaskItem: React.FC<TaskItemProps> = ({task, statusList}) => {
           onAddSubtTask={onAddSubtask}
         />
       )}
-      <div className="flex justify-end gap-3">
+      <div className="flex justify-start gap-3 mt-5">
         <FaTrash onClick={onDeleteTask} className="cursor-pointer" />
         <FaEdit onClick={onEditTask} className="cursor-pointer" />
       </div>
@@ -142,8 +137,8 @@ const TaskItem: React.FC<TaskItemProps> = ({task, statusList}) => {
           section={task.status}
           editMode={editTask}
           taskData={task}
-          onSave={handleSave}
-          modalTitle="Add Task"
+          onSave={handleUpdateTask}
+          modalTitle="Edit Task"
         />
       )}
       {isOpenAddSubtaskModal && (

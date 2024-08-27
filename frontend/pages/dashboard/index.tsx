@@ -1,14 +1,16 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import TaskItem from './components/TaskItem';
-import {Task} from '@/models/Task';
+import {Task, TaskInput} from '@/models/Task';
 import TaskModal from './components/TaskModal';
 import {TaskStatus} from '@/models/taskStatus.enums';
 import {useTasks} from '@/contexts/TaskContext';
+import {useAuth} from '@/contexts/AuthContext';
 
 const DashboardPage = () => {
   const [isOpenAddTaskModal, setIsOpenAddTaskModal] = useState(false);
-  const [currentList, setCurrentList] = useState<TaskStatus | null>(null);
-  const {tasks, fetchTasks} = useTasks();
+  const [currentColumn, setCurrentColumn] = useState<TaskStatus | null>(null);
+  const {tasks, fetchTasks, createTask} = useTasks();
+  const {user} = useAuth();
 
   useEffect(() => {
     fetchTasks();
@@ -34,9 +36,25 @@ const DashboardPage = () => {
 
   const handleAddNewTaskModal = (listName: string) => {
     if (isTaskStatus(listName)) {
-      setCurrentList(listName);
+      setCurrentColumn(listName);
     }
     setIsOpenAddTaskModal(true);
+  };
+
+  const handleSave = async ({
+    title,
+    description,
+  }: {
+    title: string;
+    description: string;
+  }) => {
+    const newTask: TaskInput = {
+      title,
+      description,
+      status: currentColumn ?? TaskStatus.Pending,
+      userId: user?.id ?? '',
+    };
+    await createTask(newTask);
   };
 
   return (
@@ -67,7 +85,9 @@ const DashboardPage = () => {
       <TaskModal
         isOpen={isOpenAddTaskModal}
         onClose={() => setIsOpenAddTaskModal(false)}
-        section={currentList}
+        section={currentColumn}
+        onSave={handleSave}
+        modalTitle="Add new Task"
       />
     </>
   );
