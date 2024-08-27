@@ -1,8 +1,19 @@
 import React from 'react';
 import SubtaskItem from './SubtaskItem';
-import {FaPlus, FaPlusCircle} from 'react-icons/fa';
+import {FaPlus} from 'react-icons/fa';
+import {Subtask} from '@/models/Subtask';
 
-const SubtaskList = ({taskId, subtasks, onSubtaskUpdated, onAddSubtTask}) => {
+interface SubtaskListProps {
+  taskId: string;
+  subtasks: Subtask[];
+  onAddSubtTask: () => void;
+}
+
+const SubtaskList: React.FC<SubtaskListProps> = ({
+  taskId,
+  subtasks,
+  onAddSubtTask,
+}) => {
   return (
     <div className="mt-4 pl-4 border-l mb-4">
       <div className="flex items-center">
@@ -10,11 +21,7 @@ const SubtaskList = ({taskId, subtasks, onSubtaskUpdated, onAddSubtTask}) => {
         <FaPlus className="cursor-pointer" onClick={onAddSubtTask} />
       </div>
       {subtasks.map((subtask) => (
-        <SubtaskItem
-          key={subtask._id}
-          subtask={subtask}
-          onSubtaskUpdated={onSubtaskUpdated}
-        />
+        <SubtaskItem key={subtask._id} subtask={subtask} taskId={taskId} />
       ))}
     </div>
   );

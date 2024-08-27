@@ -28,10 +28,6 @@ const DashboardPage = () => {
     return newTasks;
   }, [tasks]);
 
-  useEffect(() => {
-    console.log('tasks', tasks);
-  }, [tasks]);
-
   const isTaskStatus = (value: any): value is TaskStatus => {
     return Object.values(TaskStatus).includes(value);
   };

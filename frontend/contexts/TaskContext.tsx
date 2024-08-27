@@ -16,6 +16,16 @@ interface TasksContextType {
   updateTask: (id: string, taskData: Partial<Task>) => Promise<void>;
   updateTaskStatus: (taskId: string, status: TaskStatus) => Promise<void>;
   createSubtask: (subtaskData: Partial<Subtask>) => Promise<void>;
+  changeSubtaskStatus: ({
+    taskId,
+    subtaskId,
+    status,
+  }: {
+    taskId: string;
+    subtaskId: string;
+    status: TaskStatus;
+  }) => Promise<void>;
+  deleteSubtask: (taskId: string, subtaskId: string) => Promise<void>;
   // Add other functions as needed
 }
 
@@ -105,16 +115,73 @@ export const TasksProvider: React.FC<{children: ReactNode}> = ({children}) => {
     setLoading(true);
     setError(null);
     try {
-      await api.post(`/subtasks`, subtaskData);
+      const response = await api.post(`/subtasks`, subtaskData);
       const updateTasks = tasks.map((task) =>
         task._id === subtaskData.task
-          ? {...task, subtasks: [...task.subtasks, subtaskData]}
+          ? {
+              ...task,
+              subtasks: [
+                ...task.subtasks,
+                {...subtaskData, _id: response._id} as Subtask,
+              ],
+            }
           : task,
       );
-      debugger;
       setTasks(updateTasks);
     } catch (err) {
-      setError('Failed to delete task');
+      setError('Failed to create subtask');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const changeSubtaskStatus = async ({
+    taskId,
+    subtaskId,
+    status,
+  }: {
+    taskId: string;
+    subtaskId: string;
+    status: TaskStatus;
+  }) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await api.patch(`/subtasks/${subtaskId}/status`, {status: status});
+      const updateTasks = tasks.map((task) =>
+        task._id === taskId
+          ? {
+              ...task,
+              subtasks: task.subtasks.map((sub) =>
+                sub._id === subtaskId ? {...sub, status: status} : sub,
+              ),
+            }
+          : task,
+      );
+      setTasks(updateTasks);
+    } catch (err) {
+      setError('Failed to change subtask status');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteSubtask = async (taskId: string, subtaskId: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await api.delete(`/subtasks/${subtaskId}`);
+      const updateTasks = tasks.map((task) =>
+        task._id === taskId
+          ? {
+              ...task,
+              subtasks: task.subtasks.filter((sub) => sub._id !== subtaskId),
+            }
+          : task,
+      );
+      setTasks(updateTasks);
+    } catch (err) {
+      setError('Failed to delete subtask');
     } finally {
       setLoading(false);
     }
@@ -133,6 +200,8 @@ export const TasksProvider: React.FC<{children: ReactNode}> = ({children}) => {
         updateTask,
         updateTaskStatus,
         createSubtask,
+        changeSubtaskStatus,
+        deleteSubtask,
       }}
     >
       {children}

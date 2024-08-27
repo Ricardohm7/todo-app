@@ -128,7 +128,6 @@ const TaskItem: React.FC<TaskItemProps> = ({task, statusList}) => {
         <SubtaskList
           taskId={task._id}
           subtasks={task.subtasks}
-          onSubtaskUpdated={() => {}}
           onAddSubtTask={onAddSubtask}
         />
       )}
