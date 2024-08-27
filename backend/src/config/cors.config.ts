@@ -3,7 +3,6 @@ import {config} from '.';
 
 export const corsOptions: cors.CorsOptions = {
   origin: (origin, callback) => {
-    console.log('origin', origin);
     const allowedOrigins = [
       process.env.FRONTEND_URL,
       `http://localhost:${config.serverPort}`,

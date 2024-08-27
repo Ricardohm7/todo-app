@@ -3,12 +3,14 @@ import {TaskStatus} from './status.enum';
 
 export interface ISubtask extends Document {
   title: string;
+  description: string;
   status: TaskStatus;
   task: Schema.Types.ObjectId;
 }
 
 const SubtaskSchema: Schema = new Schema({
   title: {type: String, required: true},
+  description: {type: String, required: true},
   status: {
     type: String,
     enum: Object.values(TaskStatus),

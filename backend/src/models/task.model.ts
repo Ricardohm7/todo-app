@@ -26,7 +26,7 @@ const TaskSchema: Schema = new Schema(
     },
     subtasks: [{type: Schema.Types.ObjectId, ref: 'Subtask'}],
     comments: [{type: Schema.Types.ObjectId, ref: 'Comment'}],
-    createdBy: {type: Schema.Types.ObjectId, ref: 'User', required: true},
+    createdBy: {type: Schema.Types.ObjectId, ref: 'User'},
   },
   {
     timestamps: true,
