@@ -1,6 +1,6 @@
 import {useTasks} from '@/contexts/TaskContext';
 import {TaskStatus} from '@/models/taskStatus.enums';
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {FaChevronDown, FaEdit, FaTrash} from 'react-icons/fa';
 import {Subtask} from '@/models/Subtask';
 
@@ -13,6 +13,7 @@ const SubtaskItem: React.FC<SubtaskItemProps> = ({subtask, taskId}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [status, setStatus] = useState(subtask.status);
   const {changeSubtaskStatus, deleteSubtask} = useTasks();
+  const dropdownRef = useRef<HTMLDivElement>(null); // Reference to the dropdown
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -28,14 +29,29 @@ const SubtaskItem: React.FC<SubtaskItemProps> = ({subtask, taskId}) => {
   };
 
   const onDeleteSubtask = async () => {
-    debugger;
     await deleteSubtask(taskId, subtask._id);
   };
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(event.target as Node)
+    ) {
+      setIsOpen(false); // Close dropdown if clicked outside
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="items-center justify-between py-2 flex">
       <span>{subtask.title}</span>
-      <div className="relative inline-block text-left">
+      <div className="relative inline-block text-left" ref={dropdownRef}>
         <button
           onClick={toggleDropdown}
           className={`px-2 py-1 rounded flex items-center ${

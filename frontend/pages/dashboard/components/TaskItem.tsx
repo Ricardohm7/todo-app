@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import SubtaskList from './SubtaskList';
 import {FaChevronDown, FaEdit, FaTrash} from 'react-icons/fa';
 import {useTasks} from '@/contexts/TaskContext';
@@ -15,14 +15,14 @@ interface TaskItemProps {
 
 const TaskItem: React.FC<TaskItemProps> = ({task, statusList}) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const {deleteTask, updateTaskStatus, createTask, updateTask, createSubtask} =
-    useTasks();
+  const {deleteTask, updateTaskStatus, updateTask, createSubtask} = useTasks();
   const [isOpen, setIsOpen] = useState(false);
   const [status, setStatus] = useState(task.status); // Initialize with default status
   const [isOpenAddTaskModal, setIsOpenAddTaskModal] = useState(false);
   const [isOpenAddSubtaskModal, setIsOpenAddSubtaskModal] = useState(false);
   const [editTask, setEditTask] = useState(false);
   const {user} = useAuth();
+  const dropdownRef = useRef<HTMLDivElement>(null); // Reference to the dropdown
 
   const onDeleteTask = async () => {
     await deleteTask(task._id);
@@ -89,11 +89,27 @@ const TaskItem: React.FC<TaskItemProps> = ({task, statusList}) => {
     await createSubtask(newSubtask);
   };
 
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(event.target as Node)
+    ) {
+      setIsOpen(false); // Close dropdown if clicked outside
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   return (
     <div className="border p-4 mb-4 rounded bg-gray-800 hover:bg-gray-700">
       <div className="flex justify-between items-center">
         <h3 className="text-xl font-semibold">{task.title}</h3>
-        <div className="relative inline-block text-left">
+        <div className="relative inline-block text-left" ref={dropdownRef}>
           <button
             onClick={toggleDropdown}
             className={`px-2 py-1 rounded flex items-center ${
