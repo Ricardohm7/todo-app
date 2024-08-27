@@ -7,11 +7,15 @@ import {Subtask} from '@/models/Subtask';
 interface SubtaskItemProps {
   subtask: Subtask;
   taskId: string;
+  handleEditSubtaskModal: (subtask: Subtask) => void;
 }
 
-const SubtaskItem: React.FC<SubtaskItemProps> = ({subtask, taskId}) => {
+const SubtaskItem: React.FC<SubtaskItemProps> = ({
+  subtask,
+  taskId,
+  handleEditSubtaskModal,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [status, setStatus] = useState(subtask.status);
   const {changeSubtaskStatus, deleteSubtask} = useTasks();
   const dropdownRef = useRef<HTMLDivElement>(null); // Reference to the dropdown
 
@@ -24,7 +28,6 @@ const SubtaskItem: React.FC<SubtaskItemProps> = ({subtask, taskId}) => {
       status: newStatus,
       subtaskId: subtask._id,
     });
-    setStatus(newStatus);
     setIsOpen(false); // Close dropdown after selection
   };
 
@@ -37,7 +40,7 @@ const SubtaskItem: React.FC<SubtaskItemProps> = ({subtask, taskId}) => {
       dropdownRef.current &&
       !dropdownRef.current.contains(event.target as Node)
     ) {
-      setIsOpen(false); // Close dropdown if clicked outside
+      setIsOpen(false);
     }
   };
 
@@ -49,8 +52,11 @@ const SubtaskItem: React.FC<SubtaskItemProps> = ({subtask, taskId}) => {
   }, []);
 
   return (
-    <div className="items-center justify-between py-2 flex">
-      <span>{subtask.title}</span>
+    <div className="items-center justify-between py-2 flex border-2 p-1 mb-2 rounded-md">
+      <div className="flex flex-col flex-1">
+        <span>{subtask.title}</span>
+        {subtask.description}
+      </div>
       <div className="relative inline-block text-left" ref={dropdownRef}>
         <button
           onClick={toggleDropdown}
@@ -80,8 +86,11 @@ const SubtaskItem: React.FC<SubtaskItemProps> = ({subtask, taskId}) => {
         )}
       </div>
       <div className="flex justify-end gap-3">
-        <FaTrash onClick={onDeleteSubtask} className="cursor-pointer" />
-        <FaEdit onClick={() => {}} className="cursor-pointer" />
+        <FaTrash onClick={onDeleteSubtask} className="cursor-pointer ml-2" />
+        <FaEdit
+          onClick={() => handleEditSubtaskModal(subtask)}
+          className="cursor-pointer"
+        />
       </div>
     </div>
   );

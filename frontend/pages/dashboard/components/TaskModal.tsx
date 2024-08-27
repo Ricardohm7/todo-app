@@ -1,15 +1,14 @@
 import {useState} from 'react';
-import {useAuth} from '@/contexts/AuthContext';
-import {Task, TaskInput} from '@/models/Task';
+import {Task} from '@/models/Task';
 import {TaskStatus} from '@/models/taskStatus.enums';
-import {useTasks} from '@/contexts/TaskContext';
+import {Subtask} from '@/models/Subtask';
 
 interface TaskModalProps {
   isOpen: boolean;
   onClose: () => void;
   section: TaskStatus | null;
   editMode?: boolean;
-  taskData?: Task;
+  taskData?: Task | Subtask | null;
   onSave: ({
     title,
     description,
@@ -24,7 +23,6 @@ const TaskModal: React.FC<TaskModalProps> = ({
   isOpen,
   onClose,
   section,
-  editMode = false,
   taskData,
   onSave,
   modalTitle,
@@ -33,24 +31,16 @@ const TaskModal: React.FC<TaskModalProps> = ({
   const [description, setDescription] = useState(taskData?.description ?? '');
   const [activity, setActivity] = useState([]);
   const [comment, setComment] = useState('');
-  const {createTask, updateTask} = useTasks();
-  const {user} = useAuth();
 
   if (!isOpen) return null;
 
   const handleSave = async () => {
+    if (title === '' && description === '') return;
     await onSave({title, description});
     setTitle('');
     setDescription('');
     setActivity([]);
     onClose();
-  };
-
-  const handleAddComment = () => {
-    // if (comment) {
-    //   setActivity((prevActivity) => [...prevActivity, comment]);
-    //   setComment('');
-    // }
   };
 
   return (

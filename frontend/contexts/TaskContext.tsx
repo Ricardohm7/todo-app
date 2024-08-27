@@ -26,6 +26,12 @@ interface TasksContextType {
     status: TaskStatus;
   }) => Promise<void>;
   deleteSubtask: (taskId: string, subtaskId: string) => Promise<void>;
+  updateSubtask: (
+    taskId: string,
+    subtaskId: string,
+    subtask: Partial<Subtask>,
+  ) => Promise<void>;
+
   // Add other functions as needed
 }
 
@@ -187,6 +193,33 @@ export const TasksProvider: React.FC<{children: ReactNode}> = ({children}) => {
     }
   };
 
+  const updateSubtask = async (
+    taskId: string,
+    subtaskId: string,
+    subtask: Subtask,
+  ) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await api.put(`/subtasks/${subtaskId}`, subtask);
+      const updateTasks = tasks.map((task) =>
+        task._id === taskId
+          ? {
+              ...task,
+              subtasks: task.subtasks.map((sub) =>
+                sub._id === subtaskId ? {...sub, ...subtask} : sub,
+              ),
+            }
+          : task,
+      );
+      setTasks(updateTasks);
+    } catch (err) {
+      setError('Failed to delete subtask');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <TasksContext.Provider
       value={{
@@ -202,6 +235,7 @@ export const TasksProvider: React.FC<{children: ReactNode}> = ({children}) => {
         createSubtask,
         changeSubtaskStatus,
         deleteSubtask,
+        updateSubtask,
       }}
     >
       {children}
